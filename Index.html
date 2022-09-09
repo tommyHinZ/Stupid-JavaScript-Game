@@ -28,7 +28,7 @@
             const canvas = document.getElementById("myCanvas");
             const ctx = canvas.getContext("2d");
             const audioBox = document.getElementById("audioBox");
-            audioBox.playbackRate = 1.2;
+            audioBox.playbackRate = 1;
             let gamePhase = false;
             let gameOver = false;
 
@@ -58,21 +58,68 @@
 
             var interval;
 
+            async function difficultyIntervals(){
+                await level1;
+                await level2;
+                await level3;
+                await level4;
+                await level5;
+            }
+
+            function level1(){
+                return new Promise(resolve => {
+                    setTimeout(()=>{
+                        updateBallsSpeed(4);
+                        audioBox.playbackRate = 1.2;
+                    },15000);
+                })
+            }
+
+            function level2(){
+
+            }
+
+            function level3(){
+
+            }
+
+            function level4(){
+
+            }
+
+            function level5(){
+
+            }
+
+            function updateBallsSpeed(newSpeed){
+                for(const ball of balls){
+                    ball.speed = newSpeed;
+                }
+            }
+
             function enterGamePhase(){
                 gamePhase = true;
 
-                for(let i = 0; i < 6; i++){
+                for(let i = 0; i < 3; i++){
                     let ball = {
                         x : Math.floor(Math.random() * (canvas.width -40 )) + 20,
                         y : Math.floor(Math.random() * canvas.height / 2) + 20,
-                        dx: 2 * Math.random() < 0.5 ? -1 : 1,
-                        dy: 2 * Math.random() < 0.5 ? -1 : 1
+                        speed: 2,
+                        x_direction: Math.random() < 0.5 ? -1 : 1,
+                        y_direction: Math.random() < 0.5 ? -1 : 1,
+                        dx: function(){
+                            return this.speed * this.x_direction;
+                        },
+                        dy: function(){
+                            return this.speed * this.y_direction
+                        }
                     }
 
                     balls[i] = ball;
                 }
 
                 interval = setInterval(update, 10);
+                difficultyIntervals();
             }
 
             function enterGameOver(){
@@ -101,14 +148,14 @@
                 for (const ball of balls){
                     drawBall(ball.x, ball.y);
                 
-                    if (ball.x + ball.dx > canvas.width - ballRadius || ball.x + ball.dx < ballRadius)
-                        ball.dx = -ball.dx;
+                    if (ball.x + ball.dx() > canvas.width - ballRadius || ball.x + ball.dx() < ballRadius)
+                        ball.x_direction = -ball.x_direction;
 
-                    if(ball.y + ball.dy < ballRadius){
-                        ball.dy = - ball.dy;
-                    } else if (ball.y + ball.dy > canvas.height - ballRadius) {
+                    if(ball.y + ball.dy() < ballRadius){
+                        ball.y_direction = - ball.y_direction;
+                    } else if (ball.y + ball.dy() > canvas.height - ballRadius) {
                         if (ball.x > paddleX && ball.x < paddleX + paddleWidth) {
-                            ball.dy = -ball.dy;
+                            ball.y_direction = -ball.y_direction;
                         }
                         else{
                             if(!gameOver){
@@ -117,8 +164,8 @@
                         }
                     }
 
-                    ball.x += ball.dx;
-                    ball.y += ball.dy;
+                    ball.x += ball.dx();
+                    ball.y += ball.dy();
                 }
             }
             
