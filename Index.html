@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Stupid JavaScript Game</title>
+        <style>
+          * {
+            padding: 0;
+            margin: 0;
+          }
+          canvas {
+            background: #eee;
+            display: block;
+            margin: 0 auto;
+          }
+        </style>
+    </head>
+    <body>
+        <canvas id="myCanvas" width="1024" height="768"></canvas>
+        <audio controls autoplay loop id="audioBox" style="
+            display: block;
+            margin-left: auto;
+            margin-right: auto;">
+            <source src="teris.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>   
+        <script>
+            const canvas = document.getElementById("myCanvas");
+            const ctx = canvas.getContext("2d");
+            const audioBox = document.getElementById("audioBox");
+            audioBox.playbackRate = 1.2;
+            let playingAudio = false;
+
+            const ballRadius = 10;
+            const balls = [];
+
+            const paddleHeight = 10;
+            const paddleWidth = 75;
+            let paddleX = (canvas.width - paddleWidth) / 2;
+            
+            let rightPressed = false;
+            let leftPressed = false;
+
+            for(let i = 0; i < 6; i++){
+                let ball = {
+                    x : Math.floor(Math.random() * canvas.width),
+                    y : Math.floor(Math.random() * canvas.height),
+                    dx: 2 * Math.random() < 0.5 ? -1 : 1,
+                    dy: 2 * Math.random() < 0.5 ? -1 : 1
+                }
+
+                balls[i] = ball;
+            }
+
+            function draw(){
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                for (const ball of balls){
+                    drawBall(ball.x, ball.y);
+                
+                    if (ball.x + ball.dx > canvas.width - ballRadius || ball.x + ball.dx < ballRadius)
+                        ball.dx = -ball.dx;
+
+                    if(ball.y + ball.dy < ballRadius || ball.y + ball.dy > canvas.height - ballRadius)
+                        ball.dy = - ball.dy;
+                    
+                    ball.x += ball.dx;
+                    ball.y += ball.dy;
+                }
+
+                drawPaddle();
+
+                if (rightPressed) {
+                    paddleX = Math.min(paddleX + 7, canvas.width - paddleWidth);
+                } else if (leftPressed) {
+                    paddleX = Math.max(paddleX - 7, 0);
+                }
+            }
+
+            function drawBall(x,y){
+                ctx.beginPath();
+                ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+                ctx.fillStyle = "#FF0000";
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            function drawPaddle(){
+                ctx.beginPath();
+                ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+                ctx.fillStyle = "#0095DD";
+                ctx.fill();
+                ctx.closePath();
+            }
+            
+            function keyDownHandler(e) {
+                if(playingAudio == false)
+                    audioBox.play();
+
+                if (e.key === "Right" || e.key === "ArrowRight") {
+                    rightPressed = true;
+                } else if (e.key === "Left" || e.key === "ArrowLeft") {
+                    leftPressed = true;
+                }
+            }
+
+            function keyUpHandler(e) {
+                if (e.key === "Right" || e.key === "ArrowRight") {
+                    rightPressed = false;
+                } else if (e.key === "Left" || e.key === "ArrowLeft") {
+                    leftPressed = false;
+                }
+            }
+
+            document.addEventListener("keydown", keyDownHandler, false);
+            document.addEventListener("keyup", keyUpHandler, false);
+            const interval = setInterval(draw, 10);
+
+            
+        </script> 
+    </body>
+</html>
