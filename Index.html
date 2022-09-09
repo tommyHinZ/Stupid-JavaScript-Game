@@ -37,6 +37,10 @@
 
             const paddleHeight = 10;
             const paddleWidth = 150;
+            let paddleColour = "#0095DD";
+            const paddleNormalSpeed = 7;
+            const paddleBoostedSpeed = paddleNormalSpeed * 3;
+            let paddleSpeed = paddleNormalSpeed;
             const paddles = [];
 
             let paddleX = (canvas.width - paddleWidth) / 2;
@@ -122,9 +126,9 @@
                 drawPaddle();
                 
                 if (rightPressed) {
-                    paddleX = Math.min(paddleX + 7, canvas.width - paddleWidth);
+                    paddleX = Math.min(paddleX + paddleSpeed, canvas.width - paddleWidth);
                 } else if (leftPressed) {
-                    paddleX = Math.max(paddleX - 7, 0);
+                    paddleX = Math.max(paddleX - paddleSpeed, 0);
                 }
             }
 
@@ -139,11 +143,21 @@
             function drawPaddle(){
                 ctx.beginPath();
                 ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
-                ctx.fillStyle = "#0095DD";
+                ctx.fillStyle = paddleColour;
                 ctx.fill();
                 ctx.closePath();
             }
             
+            function boostStart(){
+                paddleSpeed = paddleBoostedSpeed;
+                paddleColour = "#34ebde";
+            }
+
+            function boostEnd(){
+                paddleSpeed = paddleNormalSpeed;
+                paddleColour = "#0095DD";
+            }
+
             function keyDownHandler(e) {
                 if(gamePhase === false && e.key === "Enter"){
                     enterGamePhase();
@@ -160,8 +174,8 @@
                     leftPressed = true;
                 }
 
-                if(e.key === "Spacebar"){
-                    spacebarPressed = true;
+                if(e.key === " "){
+                    boostStart();
                 }
             }
 
@@ -172,8 +186,8 @@
                     leftPressed = false;
                 }
 
-                if(e.key === "Spacebar"){
-                    spacebarPressed = false;
+                if(e.key === " "){
+                    boostEnd();
                 }
             }
 
