@@ -1,7 +1,8 @@
 # Stupid-JavaScript-Game
-It's a stupid javascript game
+It's a stupid javascript pong game
+
+Press enter key to start the game
 
 Press left arrow key to move left
 Press right arrow key to move right
-
-Press any key to start playing music
+Press spacebar to boost the speed
