@@ -34,6 +34,7 @@
 
             const ballRadius = 10;
             const balls = [];
+            let currentBallSpeed = 2;
 
             const paddleHeight = 10;
             const paddleWidth = 150;
@@ -59,67 +60,88 @@
             var interval;
 
             async function difficultyIntervals(){
-                await level1;
-                await level2;
-                await level3;
-                await level4;
-                await level5;
+                await sleep(10000);
+                level1();
+                await sleep(10000);
+                level2();
+                await sleep(10000);
+                level3();
+                await sleep(10000);
+                level4();
+                await sleep(10000);
+                level5();
             }
 
             function level1(){
-                return new Promise(resolve => {
-                    setTimeout(()=>{
-                        updateBallsSpeed(4);
-                        audioBox.playbackRate = 1.2;
-                    },15000);
-                })
+                updateBallsSpeed(3);
+                audioBox.playbackRate = 1.1;
             }
 
             function level2(){
-
+                spawnBalls(2);
+                audioBox.playbackRate = 1.2;
             }
 
             function level3(){
-
+                updateBallsSpeed(3.5);
+                audioBox.playbackRate = 1.4;
             }
 
             function level4(){
-
+                spawnBalls(2);
+                audioBox.playbackRate = 1.6;
             }
 
             function level5(){
-
+                updateBallsSpeed(4);
+                audioBox.playbackRate = 1.8;
             }
 
             function updateBallsSpeed(newSpeed){
+                currentBallSpeed = newSpeed;
                 for(const ball of balls){
-                    ball.speed = newSpeed;
+                    ball.speed = currentBallSpeed;
                 }
+            }
+
+            function spawnBall(){
+
+                let ball = {
+                    x : Math.floor(Math.random() * (canvas.width -40 )) + 20,
+                    y : 10,
+                    speed: currentBallSpeed,
+                    x_direction: Math.random() < 0.5 ? -1 : 1,
+                    y_direction: Math.random() < 0.5 ? -1 : 1,
+                    dx: function(){
+                        return this.speed * this.x_direction;
+                    },
+                    dy: function(){
+                        return this.speed * this.y_direction
+                    }
+                }
+                balls[balls.length] = ball;
+            }
+
+            function sleep(ms){
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            async function spawnBalls(number){
+                if(number === 0)
+                    return;
+                
+                spawnBall();
+                await sleep(2000);
+                spawnBalls(number-1);
             }
 
             function enterGamePhase(){
                 gamePhase = true;
 
-                for(let i = 0; i < 3; i++){
-                    let ball = {
-                        x : Math.floor(Math.random() * (canvas.width -40 )) + 20,
-                        y : Math.floor(Math.random() * canvas.height / 2) + 20,
-                        speed: 2,
-                        x_direction: Math.random() < 0.5 ? -1 : 1,
-                        y_direction: Math.random() < 0.5 ? -1 : 1,
-                        dx: function(){
-                            return this.speed * this.x_direction;
-                        },
-                        dy: function(){
-                            return this.speed * this.y_direction
-                        }
-                    }
-
-                    balls[i] = ball;
-                }
-
                 interval = setInterval(update, 10);
                 difficultyIntervals();
+
+                spawnBalls(2);
             }
 
             function enterGameOver(){
