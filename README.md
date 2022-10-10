@@ -9,3 +9,5 @@ Press spacebar to boost the speed
 
 Plan: 
 Use Neat algo to train an AI to play this
+
+Testing
